@@ -5,24 +5,9 @@ import cv2
 import time
 import pyautogui as auto
 
-def loadArrow():
-    #Loading templates
-    tpl_l = cv2.imread('templates/left_tpl.png')
-    tpl_r = cv2.imread('templates/right_tpl.png')
-    tpl_u = cv2.imread('templates/up_tpl.png')
-    tpl_d = cv2.imread('templates/down_tpl.png')
-    tpl_0 = cv2.imread('templates/blank_tpl.png')
-
-    #Converting to grayscale for cv2 processing
-    tpl_l = cv2.cvtColor(np.array(tpl_l), cv2.COLOR_BGR2GRAY)
-    tpl_r = cv2.cvtColor(np.array(tpl_r), cv2.COLOR_BGR2GRAY)
-    tpl_u = cv2.cvtColor(np.array(tpl_u), cv2.COLOR_BGR2GRAY)
-    tpl_d = cv2.cvtColor(np.array(tpl_d), cv2.COLOR_BGR2GRAY)
-    tpl_0 = cv2.cvtColor(np.array(tpl_0), cv2.COLOR_BGR2GRAY)
-
-    return tpl_l, tpl_r, tpl_u, tpl_d, tpl_0
 
 def loadArrow_f():
+    #This function loads arrow templates into the workspace
     #Loading templates
     tpl_l = cv2.imread('templates/f_left_tpl.png')
     tpl_r = cv2.imread('templates/f_right_tpl.png')
@@ -39,20 +24,8 @@ def loadArrow_f():
 
     return tpl_l, tpl_r, tpl_u, tpl_d, tpl_0
 
-def loadText():
-    #Loading templates
-    tpl_done = cv2.imread('templates/done_tpl.png')
-    tpl_go = cv2.imread('templates/go_tpl.png')
-    tpl_match = cv2.imread('templates/match_tpl.png')
-
-    #Converting to grayscale for cv2 processing
-    tpl_done = cv2.cvtColor(np.array(tpl_done), cv2.COLOR_BGR2GRAY)
-    tpl_go = cv2.cvtColor(np.array(tpl_go), cv2.COLOR_BGR2GRAY)
-    tpl_match = cv2.cvtColor(np.array(tpl_match), cv2.COLOR_BGR2GRAY)
-
-    return tpl_done, tpl_go, tpl_match
-
 def loadText_f():
+    #This function loads text templates into the workspace
     #Loading templates
     tpl_done = cv2.imread('templates/f_done_tpl.png')
     tpl_go = cv2.imread('templates/f_go_tpl.png')
@@ -66,6 +39,7 @@ def loadText_f():
     return tpl_done, tpl_go, tpl_match
 
 def tplComp(status,tpl):
+    #This function compares template and image to identify text or arrows
     #Perform match operations.
     res = cv2.matchTemplate(status,tpl,cv2.TM_CCOEFF_NORMED)
 
@@ -82,6 +56,7 @@ def tplComp(status,tpl):
        return 0
 
 def checkGen(tpl):
+    #This funcion takes a screenshot and calls tplComp to identify one template
     #Pulling screenshot
     pic = PIL.ImageGrab.grab()
 
@@ -97,6 +72,7 @@ def checkGen(tpl):
     return identified
 
 def checkBlank(pic,tpl):
+    #This function calls tplComp to compare a given, cv2-ready image to a template
     #Checking arrows against templates
     if tplComp(pic,tpl):
         arrow = 'blank'
@@ -106,6 +82,7 @@ def checkBlank(pic,tpl):
     return arrow
 
 def checkStatus(tpl_done, tpl_go, tpl_match):
+    #This function checks for Go!, Match This!, and Done! indicators
     #Predfine output
     status = []
 
@@ -127,6 +104,7 @@ def checkStatus(tpl_done, tpl_go, tpl_match):
 
 
 def checkArrow(pic, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0):
+    #This function checks for any direction arrow and or a blank space where the arrow resides
     #Predfine output
     arrow = []
     
@@ -156,9 +134,10 @@ def recordSequence(duration):
     return memory
 
 def analyzeSequence(memory, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0):
+    #Analyzes the memory to deduce a sequence of arrows
     mem_conv = [] #Predefining converted memory list
 
-    #Converting memory screenshots to suitable cv2 template images
+    #Converting memory screenshots to suitable cv2 template images to allow calling of tplComp
     for pic in memory:
         mem_conv.append(cv2.cvtColor(np.array(pic), cv2.COLOR_RGB2GRAY))
 
@@ -171,16 +150,21 @@ def analyzeSequence(memory, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0):
     sequence = [] #Predefining arrow sequence list
 
     for pic in mem_slice:
+        #Identify if a blank or directional arrow is in the image
         arrow = checkArrow(pic, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0)
         if arrow and blank and arrow != 'blank':
+            #If an arrow is identifed and a blank was identified beforehand, add the arrow to the sequence
             sequence.append(arrow)
+            #Reset the blank indicator, requiring that a blank re-trigger it to prevent double counting 
             blank = 0
         elif arrow == 'blank':
+            #Blank indicator tracking
             blank = 1
 
     return sequence
 
 def runRound(round,now,runtime,tpl_l, tpl_r, tpl_u, tpl_d, tpl_0,tpl_go):
+    #The window that needs to be recorded increases with each round by this function
     roundtime = 3 + 1.1*round
     #Record for the round duration
     memory = recordSequence(roundtime)
@@ -192,5 +176,6 @@ def runRound(round,now,runtime,tpl_l, tpl_r, tpl_u, tpl_d, tpl_0,tpl_go):
         if checkGen(tpl_go):
             #Execute arrow sequence on keyboard
             auto.press(sequence,interval=2)
+            #Testing tool, unnecesary 
             print(sequence)
             break
