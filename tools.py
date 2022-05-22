@@ -135,21 +135,22 @@ def recordSequence(duration):
 
 def analyzeSequence(memory, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0):
     #Analyzes the memory to deduce a sequence of arrows
+    #Reformatting memory to only include around 80 screenshots
+    #This balances accuracy and computational load
+    slice = int(len(memory)/80)
+    slice = 1 if slice < 1 else slice #Making sure we don't end up with a 0 slice
+    mem_slice = memory[::slice]
+
     mem_conv = [] #Predefining converted memory list
 
     #Converting memory screenshots to suitable cv2 template images to allow calling of tplComp
-    for pic in memory:
+    for pic in mem_slice:
         mem_conv.append(cv2.cvtColor(np.array(pic), cv2.COLOR_RGB2GRAY))
-
-    #Reformatting memory to only include around 80 screenshots
-    #This balances accuracy and computational load
-    slice = int(len(mem_conv)/80)
-    mem_slice = mem_conv[::slice]
     
     blank = 1 #Blank tracker to avoid double counting arrows
     sequence = [] #Predefining arrow sequence list
 
-    for pic in mem_slice:
+    for pic in mem_conv:
         #Identify if a blank or directional arrow is in the image
         arrow = checkArrow(pic, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0)
         if arrow and blank and arrow != 'blank':

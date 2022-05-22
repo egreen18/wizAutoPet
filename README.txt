@@ -23,6 +23,8 @@ the box for you. If you do not, here are my recommendations for getting this pro
     box containing the status of the game ('Match This!', 'Go!', 'Done!') and the arrow indicator
      - If possible, set the resolution of your Wizard101 client to match mine. If this is not possible, you may have to
     replace the screenshots in the template folder with your own screenshots
+     - Lastly, if your computer cannot take atleast 20 screenshots per second using PIL, then I cannot gauruntee the 
+    accuracy of the program output
 
 
 Good luck! I hope this little program is useful or interesting to you!
