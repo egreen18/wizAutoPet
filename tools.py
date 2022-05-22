@@ -1,6 +1,5 @@
 import PIL.ImageGrab
 import numpy as np
-import numpy as np
 import cv2
 import time
 import pyautogui as auto
@@ -166,7 +165,7 @@ def analyzeSequence(memory, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0):
 
 def runRound(round,now,runtime,tpl_l, tpl_r, tpl_u, tpl_d, tpl_0,tpl_go):
     #The window that needs to be recorded increases with each round by this function
-    roundtime = 3 + 1.1*round
+    roundtime = 3.2 + 1.1*round
     #Record for the round duration
     memory = recordSequence(roundtime)
     #Analyze recorded screenshots for arrow sequence

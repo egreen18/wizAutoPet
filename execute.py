@@ -1,6 +1,5 @@
-from tools import loadArrow_f, loadText_f, checkStatus, checkArrow, recordSequence, checkGen, runRound
+from tools import loadArrow_f, loadText_f, checkGen, runRound
 import time
-import pyautogui as auto
 
 tpl_l, tpl_r, tpl_u, tpl_d,tpl_0 = loadArrow_f()
 tpl_done, tpl_go, tpl_match = loadText_f()
