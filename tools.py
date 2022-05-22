@@ -13,7 +13,7 @@ def loadArrow_f():
     tpl_r = cv2.imread('templates/f_right_tpl.png')
     tpl_u = cv2.imread('templates/f_up_tpl.png')
     tpl_d = cv2.imread('templates/f_down_tpl.png')
-    tpl_0 = cv2.imread('templates/blank_tpl.png')
+    tpl_0 = cv2.imread('templates/f_blank_tpl.png')
 
     #Converting to grayscale for cv2 processing
     tpl_l = cv2.cvtColor(np.array(tpl_l), cv2.COLOR_BGR2GRAY)
