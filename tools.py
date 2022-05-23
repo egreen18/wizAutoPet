@@ -5,7 +5,7 @@ import time
 import pyautogui as auto
 
 
-def loadArrow_f():
+def loadTemplates():
     #This function loads arrow templates into the workspace
     #Loading templates
     tpl_l = cv2.imread('templates/f_left_tpl.png')
@@ -13,6 +13,13 @@ def loadArrow_f():
     tpl_u = cv2.imread('templates/f_up_tpl.png')
     tpl_d = cv2.imread('templates/f_down_tpl.png')
     tpl_0 = cv2.imread('templates/f_blank_tpl.png')
+    tpl_done = cv2.imread('templates/f_done_tpl.png')
+    tpl_go = cv2.imread('templates/f_go_tpl.png')
+    tpl_match = cv2.imread('templates/f_match_tpl.png')
+    tpl_dance = cv2.imread('templates/f_dance_tpl.png')     #(840 160 1080 200)
+    tpl_reward = cv2.imread('templates/f_reward_tpl.png')   #(820 160 1080 200)
+    tpl_feed = cv2.imread('templates/f_feed_tpl.png')       #(820 160 1080 200)
+    tpl_fed = cv2.imread('templates/f_fed_tpl.png')         #(810 160 1090 200)
 
     #Converting to grayscale for cv2 processing
     tpl_l = cv2.cvtColor(np.array(tpl_l), cv2.COLOR_BGR2GRAY)
@@ -20,22 +27,29 @@ def loadArrow_f():
     tpl_u = cv2.cvtColor(np.array(tpl_u), cv2.COLOR_BGR2GRAY)
     tpl_d = cv2.cvtColor(np.array(tpl_d), cv2.COLOR_BGR2GRAY)
     tpl_0 = cv2.cvtColor(np.array(tpl_0), cv2.COLOR_BGR2GRAY)
-
-    return tpl_l, tpl_r, tpl_u, tpl_d, tpl_0
-
-def loadText_f():
-    #This function loads text templates into the workspace
-    #Loading templates
-    tpl_done = cv2.imread('templates/f_done_tpl.png')
-    tpl_go = cv2.imread('templates/f_go_tpl.png')
-    tpl_match = cv2.imread('templates/f_match_tpl.png')
-
-    #Converting to grayscale for cv2 processing
     tpl_done = cv2.cvtColor(np.array(tpl_done), cv2.COLOR_BGR2GRAY)
     tpl_go = cv2.cvtColor(np.array(tpl_go), cv2.COLOR_BGR2GRAY)
+    tpl_dance = cv2.cvtColor(np.array(tpl_dance), cv2.COLOR_BGR2GRAY)
+    tpl_reward = cv2.cvtColor(np.array(tpl_reward), cv2.COLOR_BGR2GRAY)
     tpl_match = cv2.cvtColor(np.array(tpl_match), cv2.COLOR_BGR2GRAY)
+    tpl_feed = cv2.cvtColor(np.array(tpl_feed), cv2.COLOR_BGR2GRAY)
+    tpl_fed = cv2.cvtColor(np.array(tpl_fed), cv2.COLOR_BGR2GRAY)
 
-    return tpl_done, tpl_go, tpl_match
+    templates = {
+        'l': tpl_l,
+        'r': tpl_r,
+        'u': tpl_u,
+        'd': tpl_d,
+        '0': tpl_0,
+        'done': tpl_done,
+        'go': tpl_go,
+        'match': tpl_match,
+        'dance': tpl_dance,
+        'reward': tpl_reward,
+        'feed': tpl_feed,
+        'fed': tpl_fed
+    }
+    return templates
 
 def tplComp(status,tpl):
     #This function compares template and image to identify text or arrows
@@ -80,7 +94,7 @@ def checkBlank(pic,tpl):
 
     return arrow
 
-def checkStatus(tpl_done, tpl_go, tpl_match):
+def checkStatus(templates):
     #This function checks for Go!, Match This!, and Done! indicators
     #Predfine output
     status = []
@@ -92,31 +106,31 @@ def checkStatus(tpl_done, tpl_go, tpl_match):
     pic = cv2.cvtColor(np.array(pic), cv2.COLOR_RGB2GRAY)
 
     #Checking arrows against templates
-    if tplComp(pic,tpl_done):
+    if tplComp(pic,templates['done']):
         status = 'done'
-    elif tplComp(pic,tpl_go):
+    elif tplComp(pic,templates['go']):
         status = 'go'
-    elif tplComp(pic,tpl_match):
+    elif tplComp(pic,templates['match']):
         status = 'match'
     
     return status
 
 
-def checkArrow(pic, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0):
+def checkArrow(pic, templates):
     #This function checks for any direction arrow and or a blank space where the arrow resides
     #Predfine output
     arrow = []
     
     #Checking arrows against templates
-    if tplComp(pic,tpl_l):
+    if tplComp(pic,templates['l']):
         arrow = 'left'
-    elif tplComp(pic,tpl_r):
+    elif tplComp(pic,templates['r']):
         arrow = 'right'
-    elif tplComp(pic,tpl_u):
+    elif tplComp(pic,templates['u']):
         arrow = 'up'
-    elif tplComp(pic,tpl_d):
+    elif tplComp(pic,templates['d']):
         arrow = 'down'
-    elif tplComp(pic,tpl_0):
+    elif tplComp(pic,templates['0']):
         arrow = 'blank'
 
     return arrow
@@ -132,7 +146,7 @@ def recordSequence(duration):
     
     return memory
 
-def analyzeSequence(memory, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0):
+def analyzeSequence(memory, templates):
     #Analyzes the memory to deduce a sequence of arrows
     #Reformatting memory to only include around 80 screenshots
     #This balances accuracy and computational load
@@ -151,7 +165,7 @@ def analyzeSequence(memory, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0):
 
     for pic in mem_conv:
         #Identify if a blank or directional arrow is in the image
-        arrow = checkArrow(pic, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0)
+        arrow = checkArrow(pic, templates)
         if arrow and blank and arrow != 'blank':
             #If an arrow is identifed and a blank was identified beforehand, add the arrow to the sequence
             sequence.append(arrow)
@@ -163,19 +177,64 @@ def analyzeSequence(memory, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0):
 
     return sequence
 
-def runRound(round,now,runtime,tpl_l, tpl_r, tpl_u, tpl_d, tpl_0,tpl_go):
+def runRound(round, now, runtime, templates):
     #The window that needs to be recorded increases with each round by this function
     roundtime = 3.2 + 1.1*round
     #Record for the round duration
     memory = recordSequence(roundtime)
     #Analyze recorded screenshots for arrow sequence
-    sequence = analyzeSequence(memory, tpl_l, tpl_r, tpl_u, tpl_d, tpl_0)
+    sequence = analyzeSequence(memory, templates)
     #Scanning for start of user input portion
     while time.time() < now+runtime:
         #If game is ready for user input
-        if checkGen(tpl_go):
+        if checkGen(templates["go"]):
             #Execute arrow sequence on keyboard
             auto.press(sequence,interval=2)
-            #Testing tool, unnecesary 
-            print(sequence)
             break
+
+def runGame(round, now, runtime, templates):
+    while time.time() < now+runtime:
+        if checkGen(templates["match"]):
+            break #Checking for 'Match This!' to see if game has started
+        
+    runRound(round, now, runtime, templates) #Running round
+    #Keeping track of the active round
+    round += 1
+    #Subsequent round begins with 'Done!' instead of 'Match This!'
+    while round <= 4:
+        if checkGen(templates["done"]):
+            runRound(round, now, runtime, templates)
+            round += 1
+    if round > 4:
+        #Resetting game
+        round = 0
+
+def startGame():
+    #Tabulated positions of UI elements
+    levels = {
+        'wiz': (647,765),
+        'kro': (794,760),
+        'mar': (975,776),
+        'mus': (1117,771),
+        'dra': (1288,766)
+    }
+    keys = list(levels.keys())
+    select = np.random.randint(0,5)
+    coord = levels[keys[select]]
+    auto.moveTo(coord) #Move to selected level
+    time.sleep(0.3)
+    auto.click() #Select
+    time.sleep(0.3)
+    auto.moveTo((1272,906)) #Move to play button
+    time.sleep(0.3)
+    auto.click() #Select
+
+def rightButton():
+    auto.moveTo(1272,906)
+    time.sleep(0.3)
+    auto.click()
+
+def leftButton():
+    auto.moveTo(633,907)
+    time.sleep(0.3)
+    auto.click()

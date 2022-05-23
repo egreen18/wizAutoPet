@@ -1,8 +1,8 @@
-from tools import loadArrow_f, loadText_f, checkGen, runRound
+from tools import loadTemplates, runGame, checkGen, startGame, leftButton, rightButton
+import pyautogui as auto
 import time
 
-tpl_l, tpl_r, tpl_u, tpl_d,tpl_0 = loadArrow_f()
-tpl_done, tpl_go, tpl_match = loadText_f()
+templates = loadTemplates()
 
 round = 0 #Initializing round tracker
 now = time.time() #This is used to allow the program to run for a desired duration
@@ -10,20 +10,14 @@ runtime = 1000 #seconds
 
 #Scanning for start of game - round one has different start indicator than other rounds so it is treated individually
 while time.time() < now+runtime:
-    #Checking for 'Match This!' to see if game has started
-    if checkGen(tpl_match):
-        #This function encompasses screen capture, image analysis, and GUI realization
-        runRound(round,now,runtime,tpl_l, tpl_r, tpl_u, tpl_d, tpl_0, tpl_go)
-        #Keeping track of the active round
-        round += 1
-        print(round)
-        #Subsequent round begins with 'Done!' instead of 'Match This!'
-        while round <= 4:
-            if checkGen(tpl_done):
-                runRound(round,now,runtime,tpl_l, tpl_r, tpl_u, tpl_d, tpl_0, tpl_go)
-                round += 1
-                #Testing tool, unecessary
-                print(round)
-    if round > 4:
-        #Resetting game
-        round = 0
+    auto.press('x') #Attempting to interact with sigil
+    auto.sleep(1.5) #Allowing for game to load
+    #If successful, should detect dance game pre game screen
+    if checkGen(templates['dance']):
+        startGame() #Auto select a level and start game
+        runGame(round, now, runtime, templates) #Running game
+        while time.time() < now+runtime:
+            if checkGen(templates['reward']):
+                break #Waiting for the post game screen to load in
+        rightButton()
+        leftButton()
