@@ -4,7 +4,6 @@ import cv2
 import time
 import pyautogui as auto
 
-
 def loadTemplates():
     #This function loads arrow templates into the workspace
     #Loading templates
@@ -16,10 +15,12 @@ def loadTemplates():
     tpl_done = cv2.imread('templates/f_done_tpl.png')
     tpl_go = cv2.imread('templates/f_go_tpl.png')
     tpl_match = cv2.imread('templates/f_match_tpl.png')
-    tpl_dance = cv2.imread('templates/f_dance_tpl.png')     #(840 160 1080 200)
-    tpl_reward = cv2.imread('templates/f_reward_tpl.png')   #(820 160 1080 200)
-    tpl_feed = cv2.imread('templates/f_feed_tpl.png')       #(820 160 1080 200)
-    tpl_fed = cv2.imread('templates/f_fed_tpl.png')         #(810 160 1090 200)
+    tpl_dance = cv2.imread('templates/f_dance_tpl.png')         #(840 160 1080 200)
+    tpl_reward = cv2.imread('templates/f_reward_tpl.png')       #(820 160 1080 200)
+    tpl_feed = cv2.imread('templates/f_feed_tpl.png')           #(820 160 1080 200)
+    tpl_fed = cv2.imread('templates/f_fed_tpl.png')             #(810 160 1090 200)
+    tpl_no_snack = cv2.imread('templates/f_no_snack_tpl.png')   #(746 738 1159 788)
+    tpl_in_client = cv2.imread('templates/f_in_client_tpl.png') #(1772 886 1920 1080)
 
     #Converting to grayscale for cv2 processing
     tpl_l = cv2.cvtColor(np.array(tpl_l), cv2.COLOR_BGR2GRAY)
@@ -34,6 +35,8 @@ def loadTemplates():
     tpl_match = cv2.cvtColor(np.array(tpl_match), cv2.COLOR_BGR2GRAY)
     tpl_feed = cv2.cvtColor(np.array(tpl_feed), cv2.COLOR_BGR2GRAY)
     tpl_fed = cv2.cvtColor(np.array(tpl_fed), cv2.COLOR_BGR2GRAY)
+    tpl_no_snack = cv2.cvtColor(np.array(tpl_no_snack), cv2.COLOR_BGR2GRAY)
+    tpl_in_client = cv2.cvtColor(np.array(tpl_in_client), cv2.COLOR_BGR2GRAY)
 
     templates = {
         'l': tpl_l,
@@ -47,7 +50,9 @@ def loadTemplates():
         'dance': tpl_dance,
         'reward': tpl_reward,
         'feed': tpl_feed,
-        'fed': tpl_fed
+        'fed': tpl_fed,
+        'no_snack':tpl_no_snack,
+        'in_client': tpl_in_client,
     }
     return templates
 
@@ -222,19 +227,30 @@ def startGame():
     select = np.random.randint(0,5)
     coord = levels[keys[select]]
     auto.moveTo(coord) #Move to selected level
-    time.sleep(0.3)
+    time.sleep(0.1)
     auto.click() #Select
-    time.sleep(0.3)
+    time.sleep(0.1)
     auto.moveTo((1272,906)) #Move to play button
-    time.sleep(0.3)
+    time.sleep(0.1)
     auto.click() #Select
 
 def rightButton():
     auto.moveTo(1272,906)
-    time.sleep(0.3)
+    time.sleep(0.1)
     auto.click()
+    time.sleep(0.1)
 
 def leftButton():
     auto.moveTo(633,907)
-    time.sleep(0.3)
+    time.sleep(0.1)
     auto.click()
+    time.sleep(0.1)
+
+def feedSnack(templates):
+    #Checking if there are any snacks available
+    if ~checkGen(templates['no_snack']):
+        auto.moveTo(640,751)
+        time.sleep(0.1)
+        auto.click()
+        time.sleep(0.1)
+        rightButton()
