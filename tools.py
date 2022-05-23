@@ -20,7 +20,8 @@ def loadTemplates():
     tpl_feed = cv2.imread('templates/f_feed_tpl.png')           #(820 160 1080 200)
     tpl_fed = cv2.imread('templates/f_fed_tpl.png')             #(810 160 1090 200)
     tpl_no_snack = cv2.imread('templates/f_no_snack_tpl.png')   #(746 738 1159 788)
-    tpl_in_client = cv2.imread('templates/f_in_client_tpl.png') #(1772 886 1920 1080)
+    tpl_in_client = cv2.imread('templates/f_chat_tpl.png')      #(1772 886 1920 1080)
+    tpl_no_energy = cv2.imread('templates/f_no_energy_tpl.png')
 
     #Converting to grayscale for cv2 processing
     tpl_l = cv2.cvtColor(np.array(tpl_l), cv2.COLOR_BGR2GRAY)
@@ -37,6 +38,7 @@ def loadTemplates():
     tpl_fed = cv2.cvtColor(np.array(tpl_fed), cv2.COLOR_BGR2GRAY)
     tpl_no_snack = cv2.cvtColor(np.array(tpl_no_snack), cv2.COLOR_BGR2GRAY)
     tpl_in_client = cv2.cvtColor(np.array(tpl_in_client), cv2.COLOR_BGR2GRAY)
+    tpl_no_energy = cv2.cvtColor(np.array(tpl_no_energy), cv2.COLOR_BGR2GRAY)
 
     templates = {
         'l': tpl_l,
@@ -53,6 +55,7 @@ def loadTemplates():
         'fed': tpl_fed,
         'no_snack':tpl_no_snack,
         'in_client': tpl_in_client,
+        'no_energy': tpl_no_energy,
     }
     return templates
 
@@ -247,10 +250,38 @@ def leftButton():
     time.sleep(0.1)
 
 def feedSnack(templates):
+    time.sleep(0.3)
     #Checking if there are any snacks available
-    if ~checkGen(templates['no_snack']):
+    if not checkGen(templates['no_snack']):
         auto.moveTo(640,751)
         time.sleep(0.1)
         auto.click()
         time.sleep(0.1)
         rightButton()
+
+def autoRun(runtime, snack):
+    templates = loadTemplates()
+    now = time.time() #This is used to allow the program to run for a desired duration
+    round = 0 #Initializing round tracker
+
+    #Scanning for start of game - round one has different start indicator than other rounds so it is treated individually
+    while time.time() < now+runtime:
+        if checkGen(templates['in_client']):
+            auto.press('x') #Attempting to interact with sigil
+        #If successful, should detect dance game pre game screen
+        if checkGen(templates['dance']):
+            #Checking to see if there is insufficient energy
+            if checkGen(templates['no_energy']):
+                leftButton() #Closing game
+                print('Insufficient energy, autoRun terminated.')
+                return #Ending function
+            startGame() #Auto select a level and start game
+            runGame(round, now, runtime, templates) #Running game
+            while time.time() < now+runtime:
+                if checkGen(templates['reward']):
+                    break #Waiting for the post game screen to load in
+            rightButton()
+            if snack:
+                feedSnack(templates)
+            leftButton()
+    print('Runtime completed, autoRun terminated.')

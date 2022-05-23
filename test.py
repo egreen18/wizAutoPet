@@ -1,6 +1,6 @@
 from tools import checkGen, loadTemplates
 templates = loadTemplates()
-while ~checkGen(templates['match']):
+while not checkGen(templates['no_snack']):
     print('unidentified')
-    while checkGen(templates['match']):
-        print('identified')
+while checkGen(templates['no_snack']):
+    print('identified')
