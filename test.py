@@ -1,6 +1,3 @@
-from tools import checkGen, loadTemplates
+from tools import tplComp, loadTemplates
 templates = loadTemplates()
-while not checkGen(templates['no_snack']):
-    print('unidentified')
-while checkGen(templates['no_snack']):
-    print('identified')
+print(tplComp(templates['screenshot'], templates['in_client']))

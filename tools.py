@@ -21,8 +21,9 @@ def loadTemplates():
     tpl_feed = cv2.imread('templates/f_feed_tpl.png')  # (820 160 1080 200)
     tpl_fed = cv2.imread('templates/f_fed_tpl.png')  # (810 160 1090 200)
     tpl_no_snack = cv2.imread('templates/f_no_snack_tpl.png')  # (746 738 1159 788)
-    tpl_in_client = cv2.imread('templates/f_chat_tpl.png')  # (1772 886 1920 1080)
+    tpl_in_client = cv2.imread('templates/m_chat_tpl.png')  # (1772 886 1920 1080)
     tpl_no_energy = cv2.imread('templates/f_no_energy_tpl.png')
+    tpl_screenshot = cv2.imread('templates/screenshot.png')
 
     # Converting to grayscale for cv2 processing
     tpl_l = cv2.cvtColor(np.array(tpl_l), cv2.COLOR_BGR2GRAY)
@@ -40,6 +41,7 @@ def loadTemplates():
     tpl_no_snack = cv2.cvtColor(np.array(tpl_no_snack), cv2.COLOR_BGR2GRAY)
     tpl_in_client = cv2.cvtColor(np.array(tpl_in_client), cv2.COLOR_BGR2GRAY)
     tpl_no_energy = cv2.cvtColor(np.array(tpl_no_energy), cv2.COLOR_BGR2GRAY)
+    tpl_screenshot = cv2.cvtColor(np.array(tpl_screenshot), cv2.COLOR_BGR2GRAY)
 
     templates = {
         'l': tpl_l,
@@ -57,14 +59,15 @@ def loadTemplates():
         'no_snack': tpl_no_snack,
         'in_client': tpl_in_client,
         'no_energy': tpl_no_energy,
+        'screenshot': tpl_screenshot,
     }
     return templates
 
 
-def tplComp(status, tpl):
+def tplComp(image, tpl):
     # This function compares template and image to identify text or arrows
     # Perform match operations.
-    res = cv2.matchTemplate(status, tpl, cv2.TM_CCOEFF_NORMED)
+    res = cv2.matchTemplate(image, tpl, cv2.TM_CCOEFF_NORMED)
 
     # Specify a threshold
     threshold = 0.8
@@ -277,6 +280,7 @@ def autoRun(runtime, snack):
 
     # Scanning for start of game - round one has different start indicator than other rounds so
     # it is treated individually
+    print('Starting game...')
     while time.time() < now + runtime:
         if checkGen(templates['in_client']):
             auto.press('x')  # Attempting to interact with sigil
