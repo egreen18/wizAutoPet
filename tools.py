@@ -233,9 +233,7 @@ def startGame():
     time.sleep(0.1)
     auto.click() #Select
     time.sleep(0.1)
-    auto.moveTo((1272,906)) #Move to play button
-    time.sleep(0.1)
-    auto.click() #Select
+    rightButton()
 
 def rightButton():
     auto.moveTo(1272,906)
@@ -253,7 +251,7 @@ def feedSnack(templates):
     time.sleep(0.3)
     #Checking if there are any snacks available
     if not checkGen(templates['no_snack']):
-        auto.moveTo(640,751)
+        auto.moveTo(640,751) #Snack 1 coordinates
         time.sleep(0.1)
         auto.click()
         time.sleep(0.1)
