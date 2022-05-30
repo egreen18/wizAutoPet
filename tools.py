@@ -1,10 +1,16 @@
-import PIL.ImageGrab
+import mss
 import numpy as np
 import cv2
 import time
 import pyautogui as auto
 import os.path as os
 import platform
+
+
+def mssMon(shape):
+    # Takes a resolution in the form of a 1,4 list and prepares it for input into mss screenshot function
+    mon = {"top": shape[1], "left": shape[0], "width": shape[2]-shape[0], "height": shape[3]-shape[1]}
+    return mon
 
 
 def osResGen():
@@ -47,7 +53,7 @@ def loadCoords(os_res):
             'left': (484, 712),
             'right': (944, 712),
             'snack': (480, 610),
-            'arrow': (680, 740, 750, 800),  # box
+            'arrow': (670, 730, 760, 810),  # box
             'levels': levels  # nested dictionary
         }
         return coords
@@ -130,7 +136,8 @@ def tplComp(image, tpl):
 def checkGen(tpl):
     # This function takes a screenshot and calls tplComp to identify one template
     # Pulling screenshot
-    pic = PIL.ImageGrab.grab()
+    with mss.mss() as sct:
+        pic = sct.grab(sct.monitors[1])
 
     # Converting to grayscale for cv2 processing
     pic = cv2.cvtColor(np.array(pic), cv2.COLOR_RGB2GRAY)
@@ -161,7 +168,8 @@ def checkStatus(templates):
     status = []
 
     # Pulling screenshot
-    pic = PIL.ImageGrab.grab()
+    with mss.mss() as sct:
+        pic = sct.grab(sct.monitors[1])
 
     # Converting to grayscale for cv2 processing
     pic = cv2.cvtColor(np.array(pic), cv2.COLOR_RGB2GRAY)
@@ -203,8 +211,10 @@ def recordSequence(duration, coords):
 
     now = time.time()
 
-    while time.time() < now + duration:
-        memory.append(PIL.ImageGrab.grab(bbox=coords['arrow']))
+    mon = mssMon(coords['arrow'])
+    with mss.mss() as sct:
+        while time.time() < now + duration:
+            memory.append(sct.grab(mon))
 
     return memory
 
@@ -286,6 +296,15 @@ def button(coords):
     time.sleep(0.1)
 
 
+def jiggle():
+    # Jiggles mouse to reactivate some buttons
+    pos = auto.position()
+
+    auto.moveTo((pos[0] + 2, pos[1] + 2))
+    time.sleep(0.05)
+    auto.moveTo((pos[0], pos[1]))
+
+
 def feedSnack(templates, coords):
     time.sleep(0.3)
     # Checking if there are any snacks available
@@ -319,8 +338,13 @@ def autoRun(runtime, snack):
             while time.time() < now + runtime:
                 if checkGen(templates['reward']):
                     break  # Waiting for the post game screen to load in
+            jiggle()
             button(coords['right'])
             if snack:
                 feedSnack(templates, coords)
             button(coords['left'])
     print('Runtime completed, autoRun terminated.')
+
+
+    # Future work: exiting out of pet level up automatically
+    # On mac_1440, X button for this is at (975 675)
