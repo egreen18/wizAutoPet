@@ -1,3 +1,8 @@
-from tools import tplComp, loadTemplates
-templates = loadTemplates()
-print(tplComp(templates['screenshot'], templates['in_client']))
+from tools import recordSequence, loadCoords, osResGen
+
+
+os_res = osResGen()
+coords = loadCoords(os_res)
+memory = recordSequence(2,coords)
+
+print(len(memory))
