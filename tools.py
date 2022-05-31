@@ -316,13 +316,13 @@ def feedSnack(templates, coords):
 def autoRun(runtime, snack):
     os_res = osResGen()
     coords = loadCoords(os_res)
-    templates = loadTemplates(os_res='temp')
+    templates = loadTemplates(os_res)
     now = time.time()  # This is used to allow the program to run for a desired duration
     round = 0  # Initializing round tracker
 
     # Scanning for start of game - round one has different start indicator than other rounds so
     # it is treated individually
-    print('Starting game...')
+    print('Looking for Wizard101 on screen...')
     while time.time() < now + runtime:
         if checkGen(templates['in_client']):
             auto.press('x')  # Attempting to interact with sigil
@@ -331,7 +331,7 @@ def autoRun(runtime, snack):
             # Checking to see if there is insufficient energy
             if checkGen(templates['no_energy']):
                 button(coords['left'])  # Closing game
-                print('Insufficient energy, autoRun terminated.')
+                print('Insufficient energy, autorun terminated.')
                 return  # Ending function
             startGame(coords)  # Auto select a level and start game
             runGame(round, now, runtime, templates, coords)  # Running game
@@ -344,7 +344,6 @@ def autoRun(runtime, snack):
                 feedSnack(templates, coords)
             button(coords['left'])
     print('Runtime completed, autoRun terminated.')
-
 
     # Future work: exiting out of pet level up automatically
     # On mac_1440, X button for this is at (975 675)
