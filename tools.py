@@ -26,7 +26,7 @@ def osResGen():
 
 
 def loadCoords(os_res):
-    if os_res == 'pc_1680':
+    if os_res == 'pc_1920':
         levels = {
             'wiz': (647, 765),
             'kro': (794, 760),
@@ -56,7 +56,7 @@ def loadCoords(os_res):
             'arrow': (670, 730, 760, 810),  # box
             'levels': levels  # nested dictionary
         }
-        return coords
+    return coords
 
 
 def loadTemplates(os_res):
