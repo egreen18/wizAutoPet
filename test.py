@@ -1,6 +1,7 @@
-from tools import checkGen, loadTemplates
-templates = loadTemplates()
-while not checkGen(templates['no_snack']):
-    print('unidentified')
-while checkGen(templates['no_snack']):
-    print('identified')
+from tools import recordSequence, loadCoords, osResGen
+import cv2
+import numpy as np
+
+
+os_res = osResGen()
+print(os_res)
