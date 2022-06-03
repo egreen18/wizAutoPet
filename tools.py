@@ -56,6 +56,21 @@ def loadCoords(os_res):
             'arrow': (670, 730, 760, 810),  # box
             'levels': levels  # nested dictionary
         }
+    elif os_res == 'pc_2560':
+        levels = {
+            'wiz': (850, 1025),
+            'kro': (1065, 1025),
+            'mar': (1275, 1025),
+            'mus': (1480, 1025),
+            'dra': (1700, 1025)
+        }
+        coords = {
+            'left': (880, 1195),
+            'right': (1695, 1195),
+            'snack': (850, 1025),
+            'arrow': (1200, 1250, 1400, 1370),  # box
+            'levels': levels  # nested dictionary
+        }
     return coords
 
 
