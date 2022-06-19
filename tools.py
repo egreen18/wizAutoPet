@@ -26,6 +26,7 @@ def osResGen():
 
 
 def loadCoords(os_res):
+    coords = 0
     if os_res == 'pc_1920':
         levels = {
             'wiz': (647, 765),
@@ -331,6 +332,9 @@ def feedSnack(templates, coords):
 def autoRun(runtime, snack):
     os_res = osResGen()
     coords = loadCoords(os_res)
+    if not coords:
+        print('Your OS and Resolution combination has not been configured.')
+        return
     templates = loadTemplates(os_res)
     now = time.time()  # This is used to allow the program to run for a desired duration
     round = 0  # Initializing round tracker
